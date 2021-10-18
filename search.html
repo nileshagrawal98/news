@@ -203,6 +203,11 @@
 
         let query_here = document.getElementById("query").value;
 
+        if(query_here == ""){
+            alert("Search field can't be empty");
+            return;
+        }
+
         localStorage.setItem("query", query_here);
         getSearchResults();
         
