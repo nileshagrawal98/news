@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title id="pageTitle">Search</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .news-box {
+            display: flex;
+            background-color: whitesmoke;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid rgba(153, 153, 153, 0.562);
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .news-box:hover {
+            background-color: rgb(241, 241, 241);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.144);
+        }
+
+        .news-box>div:nth-of-type(1) {
+            width: 45%;
+        }
+
+        .news-box>div:nth-of-type(2) {
+            width: 40%;
+            color: rgb(54, 54, 54);
+        }
+
+        .news-box>div:nth-of-type(3) {
+            width: 15%;
+        }
+
+        .news-box>div:nth-of-type(3) img {
+            width: 100%
+        }
+
+        .nav-bar{
+            display: flex;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            max-width: 1200px;
+            width: 100%;
+            background-color: rgb(192, 191, 191);
+            border: 1px solid gray;
+            border-radius: 5px;
+            padding: 4px;
+            box-sizing: border-box;
+
+        }
+
+        .nav-item {
+            border: 1px solid gray;
+            padding: 5px 10px;
+            background-color: rgb(218, 218, 218);
+            color: black;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .nav-item > img {
+            vertical-align: text-top;
+            margin-right: 4px;
+        }
+
+        .input-box{
+            padding: 5px;
+            color: gray;
+        }
+
+        .input-box:focus{
+            color: black;
+        }
+
+        .info-text {
+            color: rgb(54, 54, 54);
+            margin: 0 0 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div id="navArea" class="nav-bar">
+            <a href="home.html" class="nav-item">Home</a>
+            <form>
+                <input type="text" id="query" placeholder="Search News" class="input-box" />
+                <button type="submit" onclick="searchNews(event)" class="nav-item"><img src="https://img.icons8.com/ios-glyphs/30/000000/search--v2.png" width="14"/>Search</button>
+            </form>
+        </div>
+        <h3 id="searchTitle"></h3>
+        <div id="searchResult"></div>
+    </div>
+
+</body>
+
+<script>
+
+    
+
+    async function getSearchResults() {
+        let query = localStorage.getItem("query");
+        console.log(query);
+        let searchResult = document.getElementById("searchResult");
+
+        document.getElementById("pageTitle").innerText = query + " - Search Result";
+
+        try {
+            let res = await fetch(`https://newsapi.org/v2/everything?q=${query}&sortBy=popularity&apiKey=6e090dfbade046388eb6c0239e50db8b`)
+
+            let data = await res.json();
+
+            console.log(data);
+            document.getElementById("searchTitle").innerText = `Search result for '${query}'`
+            showSearchResults(data.articles);
+        }catch(e) {
+            console.log(e);
+        }
+
+    }
+
+    getSearchResults();
+
+    function showSearchResults(data) {
+        let searchResult = document.getElementById("searchResult");
+
+        searchResult.innerHTML = "";
+
+        data.forEach(e => {
+            let div = document.createElement("div");
+
+            div.className = "news-box";
+
+            div.onclick = function () {
+                localStorage.setItem("newsData", JSON.stringify(e));
+                window.location.href = "news.html";
+            }
+
+            let div_1 = document.createElement("div");
+
+            let title = document.createElement("p");
+
+            title.innerText = e.title;
+            title.className = "title";
+
+            let author = document.createElement("p");
+            author.innerText = e.author;
+            author.className = "info-text";
+
+            let published = document.createElement("p");
+            published.innerText = e.publishedAt;
+            published.className = "info-text";
+
+
+            div_1.append(title, author, published);
+
+            let div_2 = document.createElement("div");
+
+            let image = document.createElement("img");
+
+            image.src = e.urlToImage;
+
+            div_2.append(image);
+
+            let div_3 = document.createElement("div");
+
+            let description = e.description;
+
+            div_3.append(description);
+
+            div.append(div_1, div_3, div_2);
+
+            searchResult.append(div);
+
+        })
+    }
+
+    function searchNews(e){
+        e.preventDefault();
+
+        let query_here = document.getElementById("query").value;
+
+        localStorage.setItem("query", query_here);
+        getSearchResults();
+        
+    }
+
+
+</script>
+
+</html>
